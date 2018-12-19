@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">TJCardView</string>
+    <string name="app_link_pager" translatable="false">com.tj.order.card.launcher</string>
+</resources>
