@@ -31,4 +31,4 @@
     }
 ```
 ### 效果预览
-![image](https://github.com/TJHello/TJCardLayoutManager/blob/master/untitled.gif)
+![image](https://gitee.com/tjbaobao/TJCardLayoutManager/attach_files/download?i=194213&u=http%3A%2F%2Ffiles.git.oschina.net%2Fgroup1%2FM00%2F05%2FFE%2FPaAvDFwbfjaAPQitADyCgsT9sOw607.gif%3Ftoken%3Dd1473a3937e8b7f5bb622f4591c700b3%26ts%3D1545305654%26attname%3Duntitled.gif)
