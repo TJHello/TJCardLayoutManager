@@ -2,6 +2,7 @@ package com.tj.order.card.layoutmanager
 
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import com.tj.order.card.layoutmanager.utils.LogUtil
 
 @Suppress("MemberVisibilityCanBePrivate")
 /**
@@ -144,7 +145,7 @@ class TJCardLayoutManager : RecyclerView.LayoutManager() {
             val top = (height-itemHeight)/2
             layoutDecorated(view,left,top,left+itemWidth,top+itemHeight)
             view.alpha = 1f
-            view.translationX = 0f
+            view.translationX = width.toFloat()-left
             view.translationY = 0f
             view.scaleX = 1f
             view.scaleY = 1f

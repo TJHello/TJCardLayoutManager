@@ -434,6 +434,14 @@ public class TJGestureUtil {
         IS_DRAG_MOVE_MIN_TIME = time;
     }
 
+    public int getScaleTouchSlop() {
+        return scaleTouchSlop;
+    }
+
+    public void setScaleTouchSlop(int scaleTouchSlop) {
+        this.scaleTouchSlop = scaleTouchSlop;
+    }
+
     private OnTJGestureListener mOnGestureListener ;
     public OnTJGestureListener getOnGestureListener() {
         return mOnGestureListener;

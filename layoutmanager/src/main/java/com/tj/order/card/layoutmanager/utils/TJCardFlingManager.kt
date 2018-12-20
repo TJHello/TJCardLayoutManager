@@ -2,6 +2,7 @@ package com.tj.order.card.layoutmanager.utils
 
 import android.graphics.Canvas
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.SimpleItemAnimator
 import com.tj.order.card.layoutmanager.TJCardLayoutManager
 import com.tj.order.card.layoutmanager.listener.OnCardViewListener
 import com.tj.order.card.layoutmanager.listener.OnTJItemTouchHelperCallback
@@ -20,6 +21,7 @@ class TJCardFlingManager(private val recyclerView: RecyclerView,private val onCa
 
     init {
         recyclerView.layoutManager = layoutManager
+        (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         helper.attachToRecyclerView(recyclerView)
     }
 
@@ -27,15 +29,16 @@ class TJCardFlingManager(private val recyclerView: RecyclerView,private val onCa
 
         override fun onFlingUp(holder: RecyclerView.ViewHolder, velocityX: Float, velocityY: Float):Boolean {
             val childView = holder.itemView
+            val position = recyclerView.getChildAdapterPosition(childView)
             val moveProgress = Math.sqrt((childView.translationX * childView.translationX + childView.translationY * childView.translationY).toDouble()).toFloat()
             val fraction = moveProgress / (recyclerView.width*0.4f)
             if(Math.abs(velocityX)>500||Math.abs(velocityY)>500) {
                 helper.nextCard(holder,velocityX,velocityY)
-                onCardViewListener.onNexCardBegin()
+                onCardViewListener.onNexCardBegin(holder,position)
                 return true
             }else if(fraction>=1){
                 helper.nextCard(holder,childView.translationX,childView.translationY)
-                onCardViewListener.onNexCardBegin()
+                onCardViewListener.onNexCardBegin(holder,position)
                 return true
             }
             return false
@@ -43,21 +46,28 @@ class TJCardFlingManager(private val recyclerView: RecyclerView,private val onCa
 
         override fun onFlingEnd(holder: RecyclerView.ViewHolder, position: Int) {
             val result = layoutManager.nextCard(holder.itemView)
-            onCardViewListener.onNexCardEnd()
+            onCardViewListener.onNexCardEnd(holder,position)
             if(!result){
                 onCardViewListener.onNoData()
             }
         }
 
         override fun onFlingEdge(orientation: Int) {
-            val view = layoutManager.lastCard()
-            if(view!=null){
-                helper.lastCard(view,orientation)
+            recyclerView.post {
+                val view = layoutManager.lastCard()
+                if(view!=null){
+                    val position = recyclerView.getChildAdapterPosition(view)
+                    val holder = recyclerView.getChildViewHolder(view)
+                    onCardViewListener.onLastCardBegin(holder,position)
+                    helper.lastCard(view,orientation)
+                }
             }
         }
 
         override fun onLastCardEnd(holder: RecyclerView.ViewHolder) {
-            onCardViewListener.onLastCardEnd()
+            val position = recyclerView.getChildAdapterPosition(holder.itemView)
+            layoutManager.setAnimPosition(position-1)
+            onCardViewListener.onLastCardEnd(holder,position)
         }
 
         override fun onResetEnd(holder: RecyclerView.ViewHolder) {

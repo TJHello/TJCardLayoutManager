@@ -7,6 +7,6 @@
         android:fromYDelta="-200%"
         android:toXDelta="0%"
         android:toYDelta="0%"
-        android:duration="580"
+        android:duration="380"
         />
 </set>

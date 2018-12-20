@@ -25,6 +25,14 @@ class MainActivity : AppCompatActivity() {
 
     companion object {
         var isRunActivity = false
+
+        fun getScreenWidth(context:Context): Int {
+            val wm = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
+            val dm = DisplayMetrics()
+            wm.defaultDisplay.getMetrics(dm)
+            return dm.widthPixels
+
+        }
     }
 
     private val list = mutableListOf<String>()
@@ -44,15 +52,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private inner class OnTJCardViewListener : OnCardViewListener{
-        override fun onNexCardBegin() {
+        override fun onNexCardBegin(holder: RecyclerView.ViewHolder, position: Int) {
         }
 
-        override fun onLastCardBegin() {
+        override fun onLastCardBegin(holder: RecyclerView.ViewHolder, position: Int) {
+
         }
 
-        override fun onNoData() {
-            super.onNoData()
+        override fun onLastCardEnd(holder: RecyclerView.ViewHolder, position: Int) {
+            adapter.notifyItemChanged(position)
         }
-
     }
 }

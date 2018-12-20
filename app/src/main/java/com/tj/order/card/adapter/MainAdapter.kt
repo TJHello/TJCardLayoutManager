@@ -1,11 +1,18 @@
 package com.tj.order.card.adapter
 
+import android.animation.Animator
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import com.airbnb.lottie.LottieComposition
+import com.tj.order.card.MainActivity
 import com.tj.order.card.R
+import com.tj.order.card.layoutmanager.listener.TJAnimatorListener
+import com.tj.order.card.layoutmanager.utils.LogUtil
 import kotlinx.android.synthetic.main.main_activity_list_item_layout.view.*
+import java.security.AccessController.getContext
 
 /**
  * 作者:TJbaobao
@@ -26,8 +33,26 @@ class MainAdapter<Info>(private val list:MutableList<Info>) : RecyclerView.Adapt
 
     override fun onBindViewHolder(holder: Holder, position: Int) {
         holder.itemView.tvTest.text = "测试$position"
+        holder.itemView.llLike.progress = 0.1f
+        holder.itemView.llLike.playAnimation()
+        holder.itemView.llLike.pauseAnimation()
+        holder.itemView.postDelayed( {
+            holder.itemView.llLike.progress = 0.1f
+            holder.itemView.llLike.playAnimation()
+            holder.itemView.llLike.pauseAnimation()
+        },580)
     }
 
 
-    class Holder(itemView: View?) : RecyclerView.ViewHolder(itemView)
+    class Holder(itemView: View?) : RecyclerView.ViewHolder(itemView){
+        init {
+            itemView?.tvTest?.setOnClickListener {
+                Toast.makeText(it.context,"点击了",Toast.LENGTH_SHORT).show()
+            }
+            itemView?.llLike?.setOnClickListener {
+                itemView.llLike.playAnimation()
+            }
+            itemView!!.llLayout.layoutParams.width = (MainActivity.getScreenWidth(itemView.context).toFloat()*0.8f).toInt()
+        }
+    }
 }

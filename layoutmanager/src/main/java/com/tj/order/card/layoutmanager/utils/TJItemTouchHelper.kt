@@ -16,6 +16,7 @@ import android.view.animation.OvershootInterpolator
 import com.tj.order.card.layoutmanager.listener.OnTJGestureListener
 import com.tj.order.card.layoutmanager.listener.OnTJItemTouchHelperCallback
 import com.tj.order.card.layoutmanager.listener.TJAnimatorListener
+import kotlin.math.abs
 import kotlin.math.max
 
 @Suppress("ProtectedInFinal")
@@ -41,6 +42,7 @@ class TJItemTouchHelper(private val callback:OnTJItemTouchHelperCallback) : Recy
     private val isTouchOnlyTop = true
     private val animHolderList = mutableListOf<View>()
     private var touchState = 0
+    private var isTouchEdge = false
 
     //一些变量
     private var selectHolder : RecyclerView.ViewHolder ?= null
@@ -52,6 +54,8 @@ class TJItemTouchHelper(private val callback:OnTJItemTouchHelperCallback) : Recy
     //一些系统的一些滑动参数
     private var mSwipeEscapeVelocity: Float = 0f
     private var mMaxSwipeVelocity: Float = 0f
+
+
 
     @SuppressLint("PrivateResource")
     fun attachToRecyclerView(recyclerView : RecyclerView){
@@ -74,14 +78,41 @@ class TJItemTouchHelper(private val callback:OnTJItemTouchHelperCallback) : Recy
 
     private inner class OnItemTouchListener : RecyclerView.SimpleOnItemTouchListener() {
 
+        private var firstX = 0f
+        private var firstY = 0f
+
         override fun onTouchEvent(rv: RecyclerView, event: MotionEvent) {
-            super.onTouchEvent(rv, event)
+            if(isTouchEdge) return
+            gestureUtil.onTouchEvent(event)
+            rv.invalidate()
         }
 
         override fun onInterceptTouchEvent(rv: RecyclerView, event: MotionEvent): Boolean {
+            if(isTouchEdge) return true
             gestureUtil.onTouchEvent(event)
             rv.invalidate()
-            return selectHolder==null
+            val x = event.x
+            val y = event.y
+            when(event.action){
+                MotionEvent.ACTION_DOWN->{
+                    firstX = x
+                    firstY = y
+//                    return false
+                }
+                MotionEvent.ACTION_MOVE->{
+                    val moveX = x-firstX
+                    val moveY = y-firstY
+                   if(abs(moveX)>gestureUtil.scaleTouchSlop|| abs(moveY)>gestureUtil.scaleTouchSlop){
+                       return true
+                   }
+                }
+                MotionEvent.ACTION_UP->{
+                    firstX = 0f
+                    firstY = 0f
+//                    return false
+                }
+            }
+            return super.onInterceptTouchEvent(rv, event)||selectHolder==null
         }
     }
 
@@ -89,7 +120,6 @@ class TJItemTouchHelper(private val callback:OnTJItemTouchHelperCallback) : Recy
         private var firstX = 0f
         private var firstY = 0f
         private var isReset = false
-        private var isTouchEdge = false
 
         override fun onTouch(view: View, event: MotionEvent): Boolean {
             val x = event.x
@@ -117,8 +147,11 @@ class TJItemTouchHelper(private val callback:OnTJItemTouchHelperCallback) : Recy
                 MotionEvent.ACTION_UP,MotionEvent.ACTION_CANCEL->{
                     firstX = 0f
                     firstY = 0f
-                    isReset = false
-                    isTouchEdge = false
+                    if(isTouchEdge){
+                        isReset = false
+                        isTouchEdge = false
+                        return true
+                    }
                 }
             }
             return isTouchEdge
@@ -183,7 +216,7 @@ class TJItemTouchHelper(private val callback:OnTJItemTouchHelperCallback) : Recy
         }
     }
 
-    private inner class TJValueAnimator(view:View,toPointX:Float,toPointY:Float,duration: Long=280,interpolator:Interpolator?=null,function:()->Unit={}){
+    private inner class TJValueAnimator(view:View,toPointX:Float,toPointY:Float,duration: Long=380,interpolator:Interpolator?=null,function:()->Unit={}){
         private val fromPointF = PointF(view.translationX,view.translationY)
         private val toPointF = PointF(toPointX,toPointY)
         private val valueAnimator = ValueAnimator.ofObject(PointFEvaluator(),fromPointF,toPointF)
@@ -295,6 +328,7 @@ class TJItemTouchHelper(private val callback:OnTJItemTouchHelperCallback) : Recy
     fun lastCard(view: View,orientation: Int){
         selectHolder = mRecyclerView!!.getChildViewHolder(view)
         selectHolder?.let {
+            animHolderList.add(view)
             val itemWidth = mRecyclerView!!.layoutManager!!.getDecoratedMeasuredWidth(view)
             val itemHeight = mRecyclerView!!.layoutManager!!.getDecoratedMeasuredHeight(view)
             if(orientation==0){
@@ -304,6 +338,7 @@ class TJItemTouchHelper(private val callback:OnTJItemTouchHelperCallback) : Recy
             }
             touchState = TOUCH_STATE_RESET
             TJValueAnimator(view, 0f,0f, 380,DecelerateInterpolator()){
+                animHolderList.remove(view)
                 callback.onLastCardEnd(it)
             }.start()
         }
