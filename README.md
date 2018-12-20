@@ -31,3 +31,4 @@
     }
 ```
 ### 效果预览
+![image](https://github.com/TJHello/TJCardLayoutManager/blob/master/untitled.gif)
