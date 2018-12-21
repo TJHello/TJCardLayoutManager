@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
+import android.support.v7.widget.SimpleItemAnimator
 import android.util.DisplayMetrics
 import android.view.WindowManager
 import com.tj.order.card.adapter.MainAdapter
@@ -43,6 +44,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity_layout)
         isRunActivity = true
+        (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         cardFlingManager = TJCardFlingManager(recyclerView,OnTJCardViewListener())
         recyclerView.adapter = adapter
 
