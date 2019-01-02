@@ -44,7 +44,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.main_activity_layout)
         isRunActivity = true
-        (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         cardFlingManager = TJCardFlingManager(recyclerView,OnTJCardViewListener())
         recyclerView.adapter = adapter
 
@@ -59,6 +58,10 @@ class MainActivity : AppCompatActivity() {
 
         override fun onLastCardBegin(holder: RecyclerView.ViewHolder, position: Int) {
 
+        }
+
+        override fun onNexCardEnd(holder: RecyclerView.ViewHolder, position: Int) {
+            super.onNexCardEnd(holder, position)
         }
 
         override fun onLastCardEnd(holder: RecyclerView.ViewHolder, position: Int) {

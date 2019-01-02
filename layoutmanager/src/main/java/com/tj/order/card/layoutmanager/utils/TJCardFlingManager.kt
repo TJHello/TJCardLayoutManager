@@ -20,9 +20,16 @@ class TJCardFlingManager(private val recyclerView: RecyclerView,private val onCa
     val helper = TJItemTouchHelper(Callback())
 
     init {
+        (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
+        val anim = (recyclerView.itemAnimator as SimpleItemAnimator)
+        anim.addDuration = 0
+        anim.removeDuration = 0
+        anim.changeDuration  = 0
+        anim.moveDuration = 0
         recyclerView.layoutManager = layoutManager
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         helper.attachToRecyclerView(recyclerView)
+        layoutManager.cacheNum = 5
     }
 
     private inner class Callback : OnTJItemTouchHelperCallback {
@@ -53,14 +60,12 @@ class TJCardFlingManager(private val recyclerView: RecyclerView,private val onCa
         }
 
         override fun onFlingEdge(orientation: Int) {
-            recyclerView.post {
-                val view = layoutManager.lastCard()
-                if(view!=null){
-                    val position = recyclerView.getChildAdapterPosition(view)
-                    val holder = recyclerView.getChildViewHolder(view)
-                    onCardViewListener.onLastCardBegin(holder,position)
-                    helper.lastCard(view,orientation)
-                }
+            val view = layoutManager.lastCard()
+            if(view!=null){
+                val position = recyclerView.getChildAdapterPosition(view)
+                val holder = recyclerView.getChildViewHolder(view)
+                onCardViewListener.onLastCardBegin(holder,position)
+                helper.lastCard(view,orientation)
             }
         }
 
