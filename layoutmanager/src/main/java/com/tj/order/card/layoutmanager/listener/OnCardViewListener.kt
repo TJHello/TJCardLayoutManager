@@ -18,6 +18,7 @@ interface OnCardViewListener {
 
     fun onLastCardEnd(holder: RecyclerView.ViewHolder,position:Int){}
 
+
     fun onNoData(){
 
     }

@@ -1,18 +1,13 @@
 package com.tj.order.card.adapter
 
-import android.animation.Animator
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import com.airbnb.lottie.LottieComposition
 import com.tj.order.card.MainActivity
 import com.tj.order.card.R
-import com.tj.order.card.layoutmanager.listener.TJAnimatorListener
-import com.tj.order.card.layoutmanager.utils.LogUtil
 import kotlinx.android.synthetic.main.main_activity_list_item_layout.view.*
-import java.security.AccessController.getContext
 
 /**
  * 作者:TJbaobao

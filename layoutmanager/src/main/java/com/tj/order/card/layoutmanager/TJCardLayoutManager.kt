@@ -1,9 +1,11 @@
 package com.tj.order.card.layoutmanager
 
+import android.animation.ValueAnimator
 import android.support.v7.widget.RecyclerView
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import com.tj.order.card.layoutmanager.listener.OnManagerLayoutListener
 import com.tj.order.card.layoutmanager.utils.LogUtil
 
 @Suppress("MemberVisibilityCanBePrivate")
@@ -14,6 +16,8 @@ import com.tj.order.card.layoutmanager.utils.LogUtil
  * 使用：
  */
 class TJCardLayoutManager : RecyclerView.LayoutManager() {
+
+    private var onManagerLayoutListener : OnManagerLayoutListener?= null
 
     override fun generateDefaultLayoutParams(): RecyclerView.LayoutParams {
         return RecyclerView.LayoutParams(RecyclerView.LayoutParams.WRAP_CONTENT, RecyclerView.LayoutParams.WRAP_CONTENT)
@@ -31,11 +35,16 @@ class TJCardLayoutManager : RecyclerView.LayoutManager() {
 
     }
 
+    var cardCacheNum = 2
     var cardShowNum = CARD_SHOW_NUM
+        set(value) {
+            field=value
+            cacheNum = value + cardCacheNum
+        }
     var cardScale = CARD_SCALE
     var cardTransY = CARD_TRANS_Y
     var cardTransYWeight = CARD_TRANS_Y_WEIGHT
-    var cacheNum = cardShowNum + 4
+    var cacheNum = cardShowNum + cardCacheNum
     var orientation = ORIENTATION_BOTTOM
     var transYMode = TRANS_Y_MODE_WEIGHT
 
@@ -65,15 +74,14 @@ class TJCardLayoutManager : RecyclerView.LayoutManager() {
         var index = positionTop + cacheNum - 1
         for (i in positionTop + cacheNum - 1 downTo positionTop) {
             if (i >= itemCount) return
-            val view = recycler.getViewForPosition(i)
-//            if(hashCodeList.contains(view.hashCode())){
-//                if(view.tag!=i){
-//                    LogUtil.i("已经存在")
-//                    detachAndScrapView(view,recycler)
-//                    removeAndRecycleView(view,recycler)
-//                    view = recycler.getViewForPosition(i)
-//                }
-//            }
+            var view = recycler.getViewForPosition(i)
+            if(hashCodeList.contains(view.hashCode())){
+                if(view.tag!=i){
+                    LogUtil.i("已经存在")
+                    removeAndRecycleView(view,recycler)
+                    view = recycler.getViewForPosition(i)
+                }
+            }
             if (isOutScreen(view)) {
                 view.translationX = 0f
                 view.translationY = 0f
@@ -85,9 +93,9 @@ class TJCardLayoutManager : RecyclerView.LayoutManager() {
             }
             addView(view)
             view.tag = i
-//            if(!hashCodeList.contains(view.hashCode())){
-//                hashCodeList.add(view.hashCode())
-//            }
+            if(!hashCodeList.contains(view.hashCode())){
+                hashCodeList.add(view.hashCode())
+            }
             measureChildWithMargins(view, 0, 0)
             if (i > positionAnim) {
                 val itemWidth = getDecoratedMeasuredWidth(view)
@@ -96,7 +104,7 @@ class TJCardLayoutManager : RecyclerView.LayoutManager() {
                 val top = (height - itemHeight) / 2
                 layoutDecorated(view, left, top, left + itemWidth, top + itemHeight)
                 val level = index - positionTop
-                if (level >= CARD_SHOW_NUM) {
+                if (level >= cardShowNum) {
                     view.alpha = 0f
                 } else {
                     view.alpha = 1f
@@ -112,6 +120,7 @@ class TJCardLayoutManager : RecyclerView.LayoutManager() {
                 } else {
                     -level * fixTranY - (1f - scale) * 0.5f * itemHeight
                 }
+                onManagerLayoutListener?.onChildDraw(view,0f,level)
                 view.scaleX = scale
                 view.scaleY = scale
                 view.translationY = translationY
@@ -154,7 +163,7 @@ class TJCardLayoutManager : RecyclerView.LayoutManager() {
         view.translationY = 0f
         view.scaleX = 1f
         view.scaleY = 1f
-//        hashCodeList.remove(view.hashCode())
+        hashCodeList.remove(view.hashCode())
         removeAndRecycleView(view, recycler)
         for (i in 0 until childCount) {
             val child = getChildAt(i)
@@ -179,9 +188,9 @@ class TJCardLayoutManager : RecyclerView.LayoutManager() {
                 removeAndRecycleView(childFirst,recycler)
             }
             val view = recycler!!.getViewForPosition(positionTop)
-//            if(!hashCodeList.contains(view.hashCode())){
-//                hashCodeList.add(view.hashCode())
-//            }
+            if(!hashCodeList.contains(view.hashCode())){
+                hashCodeList.add(view.hashCode())
+            }
             addView(view)
             measureChildWithMargins(view, 0, 0)
             val itemWidth = getDecoratedMeasuredWidth(view)
@@ -201,14 +210,13 @@ class TJCardLayoutManager : RecyclerView.LayoutManager() {
 
     fun refresh(progress: Float, index: Int = 0) {
         if (index < 0) return
-//        LogUtil.i("refresh:progress=$progress,index=$index")
         for (i in 0 until childCount) {
             if (i >= itemCount) return
             val view = getChildAt(i)
             val level = childCount - i - 1 - index
             if (i < childCount - 1 - index) {
-                if (level <= CARD_SHOW_NUM) {
-                    if (level == CARD_SHOW_NUM) {
+                if (level <= cardShowNum) {
+                    if (level == cardShowNum) {
                         view.alpha = progress
                     } else {
                         view.alpha = 1f
@@ -228,6 +236,7 @@ class TJCardLayoutManager : RecyclerView.LayoutManager() {
                         -level * fixTranY - (1f - scale) * 0.5f * itemHeight + progress * fixTranY
                     }
                     view.translationY = translationY
+                    onManagerLayoutListener?.onChildDraw(view,scale,level)
                 } else {
                     view.alpha = 0f
                 }
@@ -241,6 +250,10 @@ class TJCardLayoutManager : RecyclerView.LayoutManager() {
 
     fun setAnimPosition(position: Int) {
         positionAnim = position
+    }
+
+    fun setOnManagerLayoutListener(onManagerLayoutListener : OnManagerLayoutListener){
+        this.onManagerLayoutListener = onManagerLayoutListener
     }
 
 }

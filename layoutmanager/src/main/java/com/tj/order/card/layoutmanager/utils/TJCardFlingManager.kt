@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SimpleItemAnimator
 import com.tj.order.card.layoutmanager.TJCardLayoutManager
 import com.tj.order.card.layoutmanager.listener.OnCardViewListener
+import com.tj.order.card.layoutmanager.listener.OnManagerLayoutListener
 import com.tj.order.card.layoutmanager.listener.OnTJItemTouchHelperCallback
 
 
@@ -30,6 +31,18 @@ class TJCardFlingManager(private val recyclerView: RecyclerView,private val onCa
         (recyclerView.itemAnimator as SimpleItemAnimator).supportsChangeAnimations = false
         helper.attachToRecyclerView(recyclerView)
         layoutManager.cacheNum = 5
+    }
+
+    fun setRecyclerCacheNum(cacheNum : Int){
+        layoutManager.cacheNum = cacheNum
+    }
+
+    fun setLayoutCardCacheNum(cacheNum: Int){
+        layoutManager.cardCacheNum = cacheNum
+    }
+
+    fun setLayoutManargerListener(listener:OnManagerLayoutListener){
+        layoutManager.setOnManagerLayoutListener(listener)
     }
 
     private inner class Callback : OnTJItemTouchHelperCallback {

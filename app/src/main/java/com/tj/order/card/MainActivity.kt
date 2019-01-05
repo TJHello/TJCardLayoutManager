@@ -7,10 +7,12 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.SimpleItemAnimator
 import android.util.DisplayMetrics
+import android.view.View
 import android.view.WindowManager
 import com.tj.order.card.adapter.MainAdapter
 import com.tj.order.card.layoutmanager.TJCardLayoutManager
 import com.tj.order.card.layoutmanager.listener.OnCardViewListener
+import com.tj.order.card.layoutmanager.listener.OnManagerLayoutListener
 import com.tj.order.card.layoutmanager.listener.OnTJItemTouchHelperCallback
 import com.tj.order.card.layoutmanager.utils.TJCardFlingManager
 import com.tj.order.card.layoutmanager.utils.TJItemTouchHelper
@@ -45,6 +47,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.main_activity_layout)
         isRunActivity = true
         cardFlingManager = TJCardFlingManager(recyclerView,OnTJCardViewListener())
+        cardFlingManager.setLayoutManargerListener(MyOnManagerLayoutListener())
         recyclerView.adapter = adapter
 
         for(i in 0 until 100){
@@ -66,6 +69,12 @@ class MainActivity : AppCompatActivity() {
 
         override fun onLastCardEnd(holder: RecyclerView.ViewHolder, position: Int) {
             adapter.notifyItemChanged(position)
+        }
+    }
+
+    private inner class MyOnManagerLayoutListener: OnManagerLayoutListener{
+        override fun onChildDraw(childView: View, fraction: Float, index: Int) {
+
         }
     }
 }
